@@ -11,7 +11,7 @@ from .wiki_parser.Release import Release
 from .wiki_parser.Repo import Repo
 
 
-async def get_dependency_map() -> None:
+async def get_dependency_map() -> list[Article]:
     async with httpx.AsyncClient(**httpx_client_settings) as client:
         article_files = await get_files_in_dir(
             client=client,
@@ -56,3 +56,5 @@ async def get_dependency_map() -> None:
             last_modified_date=article_file.last_modified_date,
         )
         articles.append(article)
+
+    return articles
