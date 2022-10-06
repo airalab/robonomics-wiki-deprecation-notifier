@@ -1,6 +1,7 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 
+from .GithubAccount import GithubAccount
 from .Repo import Repo
 
 
@@ -10,6 +11,7 @@ class Article:
     url: str
     dependencies: list[Repo]
     last_modified_date: datetime
+    contributors: list[GithubAccount] = field(default_factory=list)
 
     @property
     def name(self) -> str:
