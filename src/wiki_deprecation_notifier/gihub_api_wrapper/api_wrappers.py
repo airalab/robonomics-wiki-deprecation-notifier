@@ -74,3 +74,13 @@ async def get_latest_release_name_and_datetime(
     release_name = latest_release["name"]
     release_datetime = datetime.fromisoformat(latest_release["created_at"].rstrip("Z"))
     return release_name, release_datetime
+
+
+async def create_new_issue(client: httpx.AsyncClient, repo_owner: str, repo_name: str, title: str, body: str) -> str:
+    url = f"/{repo_owner}/{repo_name}/issues"
+    json = {
+        "title": title,
+        "body": body,
+    }
+    response = await client.post(url=url, json=json)
+    return str(response.json()["html_url"])
