@@ -1,4 +1,5 @@
 import asyncio
+import os
 
 import httpx
 
@@ -16,8 +17,8 @@ async def get_dependency_map() -> list[Article]:
     async with httpx.AsyncClient(**httpx_client_settings) as client:
         article_files = await get_files_in_dir(
             client=client,
-            repo_owner="airalab",
-            repo_name="robonomics-wiki",
+            repo_owner=os.environ["WIKI_REPO_OWNER"],
+            repo_name=os.environ["WIKI_REPO_NAME"],
             dir_path="/docs/en",
         )
 

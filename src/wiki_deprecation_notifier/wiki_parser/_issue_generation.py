@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from typing import TYPE_CHECKING
 
 from .Issue import Issue
@@ -30,8 +31,8 @@ def create_issue(conflict: DeprecationConflict) -> Issue:
         )
     )
     return Issue(
-        repo_owner="airalab",
-        repo_name="robonomics-wiki",
+        repo_owner=os.environ["WIKI_REPO_OWNER"],
+        repo_name=os.environ["WIKI_REPO_NAME"],
         title=issue_title,
         body=issue_body,
     )
