@@ -66,19 +66,20 @@ async def get_files_in_dir(  # noqa: CAC001
     return files
 
 
-async def get_latest_release_name_and_datetime(
+async def get_latest_release_name_url_and_datetime(
     client: httpx.AsyncClient, repo_owner: str, repo_name: str
-) -> tuple[str, datetime]:
+) -> tuple[str, str, datetime]:
     url = f"/repos/{repo_owner}/{repo_name}/releases"
     params = {"per_page": 1, "page": 1}
     response = await client.get(url=url, params=params)
     latest_releases: list[Any] = response.json()
     if not latest_releases:
-        return "Unknown", datetime.fromtimestamp(0)
+        return "Unknown", "Unknown", datetime.fromtimestamp(0)
     latest_release = latest_releases[0]
     release_name = latest_release["name"]
+    release_url = latest_release["html_url"]
     release_datetime = datetime.fromisoformat(latest_release["created_at"].rstrip("Z"))
-    return release_name, release_datetime
+    return release_name, release_url, release_datetime
 
 
 async def create_new_issue(client: httpx.AsyncClient, repo_owner: str, repo_name: str, title: str, body: str) -> str:
