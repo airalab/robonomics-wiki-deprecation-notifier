@@ -15,8 +15,13 @@ async def get_file_text_contents(client: httpx.AsyncClient, file_link: str) -> s
 async def get_files_last_modified_date(
     client: httpx.AsyncClient, repo_owner: str, repo_name: str, file_path: str
 ) -> datetime:
-    url = f"/repos/{repo_owner}/{repo_name}/commits?path={file_path}&page=1&per_page=1"
-    response = await client.get(url=url)
+    url = f"/repos/{repo_owner}/{repo_name}/commits"
+    params = {
+        "path": file_path,
+        "page": 1,
+        "per_page": 1,
+    }
+    response = await client.get(url=url, params=params)
     date = response.json()[0]["commit"]["committer"]["date"]
     return datetime.fromisoformat(date.rstrip("Z"))
 
