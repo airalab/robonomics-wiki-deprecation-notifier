@@ -2,7 +2,7 @@ import asyncio
 
 import httpx
 
-from .gihub_api_wrapper.api_wrappers import get_files_in_dir, get_latest_release_name_and_datetime
+from .gihub_api_wrapper.api_wrappers import get_files_in_dir, get_latest_release_name_url_and_datetime
 from .gihub_api_wrapper.client_settings import httpx_client_settings
 from .gihub_api_wrapper.utils import get_repo_name, get_repo_owner
 from .wiki_parser.Article import Article
@@ -31,16 +31,17 @@ async def get_dependency_map() -> list[Article]:
                 repo_owner = get_repo_owner(repo_url)
                 repo_name = get_repo_name(repo_url)
                 release_tasks.append(
-                    get_latest_release_name_and_datetime(client=client, repo_owner=repo_owner, repo_name=repo_name)
+                    get_latest_release_name_url_and_datetime(client=client, repo_owner=repo_owner, repo_name=repo_name)
                 )
 
         latest_releases = await asyncio.gather(*release_tasks)
 
     repos = {}
     for repo_url, latest_release in zip(repo_urls, latest_releases):
-        release_name, release_date = latest_release
+        release_name, release_url, release_date = latest_release
         release = Release(
             name=release_name,
+            url=release_url,
             date=release_date,
         )
         repo_name = get_repo_name(repo_url)
