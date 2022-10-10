@@ -8,7 +8,6 @@ packages = [{include = "robonomics_wiki_deprecation_notifier"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-aiogram = "^2.22.2"
 httpx = "^0.23.0"
 loguru = "^0.6.0"
 PyYAML = "^6.0"

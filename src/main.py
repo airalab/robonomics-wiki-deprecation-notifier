@@ -24,5 +24,4 @@ if __name__ == "__main__":
 # TODO: Add docker-compose
 # TODO: Add logging
 # TODO: Add Sqlite DB
-# TODO: Implement Telegram bot functions
 # TODO: Implement issue creation
