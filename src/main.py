@@ -6,11 +6,12 @@ from pathlib import Path
 import dotenv
 from loguru import logger
 
-from wiki_deprecation_notifier import run_inspection, start_daemon
-
 dotenv_file = Path(".env")
 if dotenv_file.exists():
+    logger.info(f"Loaded up .env file {dotenv_file.absolute()}")
     dotenv.load_dotenv(dotenv_file.absolute())
+
+from wiki_deprecation_notifier import run_inspection, start_daemon  # noqa: E402
 
 
 async def main() -> None:
