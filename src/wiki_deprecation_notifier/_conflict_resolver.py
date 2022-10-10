@@ -1,7 +1,9 @@
 import asyncio
 import sqlite3
+from time import time
 
 import httpx
+from loguru import logger
 
 from .db_wrapper.db import connection as db_connection
 from .gihub_api_wrapper.api_wrappers import create_new_issue
@@ -16,6 +18,7 @@ def get_conflicts(articles: list[Article]) -> list[DeprecationConflict]:
     for article in articles:
         article_conflicts = article.get_conflicts()
         conflicts.extend(article_conflicts)
+    logger.info(f"Detected {len(conflicts)} conflicts")
     return conflicts
 
 
@@ -35,9 +38,11 @@ def save_conflict(conflict: DeprecationConflict, connection: sqlite3.Connection)
 async def resolve_conflicts(conflicts: list[DeprecationConflict]) -> None:
     for conflict in conflicts:
         if conflict_saved(conflict, db_connection):
+            logger.debug(f"Conflict {conflict.conflict_hash} found in DB. Ignoring")
             continue
         save_conflict(conflict, db_connection)
         db_connection.commit()
+        logger.debug(f"Conflict {conflict.conflict_hash} registered as new and saved")
 
 
 async def post_issue(client: httpx.AsyncClient, conflict: DeprecationConflict, connection: sqlite3.Connection) -> str:
@@ -64,14 +69,17 @@ def get_pending_conflicts_hashes(connection: sqlite3.Connection) -> set[str]:
 
 async def create_issues(conflicts: list[DeprecationConflict]) -> list[str]:
     pending_conflicts_hashes = get_pending_conflicts_hashes(db_connection)
+    logger.info(f"Found {len(pending_conflicts_hashes)} conflicts awaiting action")
 
     async with httpx.AsyncClient(**httpx_client_settings) as client:
-        conflict_tasks = (
+        conflict_tasks = [
             post_issue(client=client, conflict=conflict, connection=db_connection)
             for conflict in conflicts
             if conflict.conflict_hash in pending_conflicts_hashes
-        )
+        ]
+        t0 = time()
         issue_urls: list[str] = await asyncio.gather(*conflict_tasks)
+        logger.info(f"{len(conflict_tasks)} created in {round(time() - t0, 4)}")
 
     db_connection.commit()
     return issue_urls

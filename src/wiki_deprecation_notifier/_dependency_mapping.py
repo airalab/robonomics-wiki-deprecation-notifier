@@ -1,7 +1,9 @@
 import asyncio
 import os
+from time import time
 
 import httpx
+from loguru import logger
 
 from .gihub_api_wrapper.api_wrappers import get_files_in_dir, get_latest_release_name_url_and_datetime
 from .gihub_api_wrapper.client_settings import httpx_client_settings
@@ -14,6 +16,8 @@ from .wiki_parser.Repo import Repo
 
 
 async def get_dependency_map() -> list[Article]:
+    t0 = time()
+    logger.debug("Started gathering dependency map")
     async with httpx.AsyncClient(**httpx_client_settings) as client:
         article_files = await get_files_in_dir(
             client=client,
@@ -21,7 +25,7 @@ async def get_dependency_map() -> list[Article]:
             repo_name=os.environ["WIKI_REPO_NAME"],
             dir_path="/docs/en",
         )
-
+        logger.debug(f"Fetched {len(article_files)} articles in {round(time() - t0, 4)}s")
         dep_map = {article.name: extract_dependencies(article.content) for article in article_files}
         contributors_map = {article.name: extract_contributors_usernames(article.content) for article in article_files}
         repo_urls = []
@@ -35,7 +39,9 @@ async def get_dependency_map() -> list[Article]:
                     get_latest_release_name_url_and_datetime(client=client, repo_owner=repo_owner, repo_name=repo_name)
                 )
 
+        t1 = time()
         latest_releases = await asyncio.gather(*release_tasks)
+        logger.debug(f"Fetched latest releases for {len(latest_releases)} repos in {round(time() - t1, 4)}s")
 
     repos = {}
     for repo_url, latest_release in zip(repo_urls, latest_releases):
@@ -63,4 +69,5 @@ async def get_dependency_map() -> list[Article]:
         )
         articles.append(article)
 
+    logger.debug(f"Dependency map gathering complete. Run time: {round(time() - t0, 4)}s")
     return articles

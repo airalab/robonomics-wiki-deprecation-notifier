@@ -16,6 +16,7 @@ from wiki_deprecation_notifier import run_inspection, start_daemon  # noqa: E402
 
 async def main() -> None:
     runner_mode = os.getenv("RUNNER_MODE", "single")
+    logger.debug(f"Runner mode set to '{runner_mode}'")
 
     match runner_mode:
         case "single":
