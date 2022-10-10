@@ -1,10 +1,12 @@
+import json
+import os
 from functools import lru_cache
 from typing import Any
 
 import yaml
 from yarl import URL
 
-TARGET_ORGANISATIONS = {"Multi-Agent-io", "airalab"}  # TODO: Make configurable
+TARGET_REPO_OWNERS = set(json.loads(os.getenv("TARGET_REPO_OWNERS", '["Multi-Agent-io", "airalab"]')))
 
 
 @lru_cache
@@ -35,7 +37,7 @@ def extract_dependencies(article: str) -> list[tuple[str, str]]:  # noqa: CAC001
 
         organisation, _ = source_url.path.lstrip("/").split("/", 1)
 
-        if organisation not in TARGET_ORGANISATIONS:
+        if organisation not in TARGET_REPO_OWNERS:
             continue
 
         result.append((name, source))
