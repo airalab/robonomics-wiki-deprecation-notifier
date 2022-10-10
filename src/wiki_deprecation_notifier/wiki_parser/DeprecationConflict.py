@@ -3,8 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from ._issue_generation import create_issue
 from .Issue import Issue
+from .issue_generation import create_issue
 
 if TYPE_CHECKING:
     from .Article import Article
