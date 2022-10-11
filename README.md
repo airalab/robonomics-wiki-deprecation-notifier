@@ -65,6 +65,7 @@ The environment variables and their meanings are listed below.
 - `WIKI_REPO_OWNER` (string) - Robonomics wiki repository owner account (organisation) name.
 - `TARGET_REPO_OWNERS` (JSON array of strings) - Only repositories owned by these accounts (organisations) will be
   marked as tracked dependencies.
+- `FILTER_REPOS_BY_OWNERS` (boolean) - Whether to filter repositories by their owner or not (defaults to `true`)
 - `GITHUB_API_TOKEN` (string) - Since this app makes heavy use of the GitHub API, you need to generate and provide an
   API token for the bot.
 
@@ -74,7 +75,7 @@ syntax or by mounting the `.env` file inside the container using Docker volumes.
 
 ## Contributing
 
-Create issues in this repository if there are any problems with this app or if you want to communicate a feature 
+Create issues in this repository if there are any problems with this app or if you want to communicate a feature
 request. Fork this repository and file a pull request to contribute to the app development.
 
 This project complies with the code formatting guidelines defined in the provided `.pre-commit-config.yaml` file.
