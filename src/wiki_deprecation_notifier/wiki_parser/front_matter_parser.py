@@ -1,10 +1,12 @@
 import json
 import os
+import re
 from functools import lru_cache
 from typing import Any
 
 import typed_getenv
 import yaml
+from loguru import logger
 from yarl import URL
 
 TARGET_REPO_OWNERS = set(json.loads(os.getenv("TARGET_REPO_OWNERS", '["Multi-Agent-io", "airalab"]')))
@@ -42,6 +44,13 @@ def extract_dependencies(article: str) -> list[tuple[str, str]]:  # noqa: CAC001
         if FILTER_REPOS_BY_OWNERS and organisation not in TARGET_REPO_OWNERS:
             continue
 
-        result.append((name, source))
+        pattern = r"https?://github.com/[^/]+/[^/]+"
+        repo_url = re.match(pattern, source)
+
+        if repo_url is None:
+            logger.error(f"Failed to extract repo url from URL '{source}'")
+            continue
+
+        result.append((name, repo_url[0]))
 
     return result
