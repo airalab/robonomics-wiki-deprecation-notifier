@@ -83,7 +83,7 @@ async def get_latest_release_name_url_and_datetime(
 
 
 async def create_new_issue(client: httpx.AsyncClient, repo_owner: str, repo_name: str, title: str, body: str) -> str:
-    url = f"/{repo_owner}/{repo_name}/issues"
+    url = f"/repos/{repo_owner}/{repo_name}/issues"
     json = {
         "title": title,
         "body": body,
