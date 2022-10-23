@@ -13,7 +13,7 @@ def create_issue(conflict: DeprecationConflict) -> Issue:
     issue_title = "".join(  # noqa: ECE001
         (
             "[Issue]: ",
-            f"Article {conflict.article.name} is deprecated due to ",
+            f'Article "{conflict.article.name}" is deprecated due to ',
             f'a release "{conflict.dependency.latest_release.name}" ',
             f'in "{conflict.dependency.name}".',
         )
@@ -23,7 +23,7 @@ def create_issue(conflict: DeprecationConflict) -> Issue:
             "### Issue description\n\n",
             f'Article ["{conflict.article.name}"]({conflict.article.url}) ',
             "has been automatically marked as deprecated due to ",
-            f'a recent release ["{conflict.dependency.latest_release.name}"]({conflict.dependency.latest_release.url})',
+            f'a recent release ["{conflict.dependency.latest_release.name}"]({conflict.dependency.latest_release.url}) ',
             f'in ["{conflict.dependency.name}"]({conflict.dependency.url}).',
             "\n\n",
             "An action has been requested from the article contributors:\n",
@@ -31,7 +31,7 @@ def create_issue(conflict: DeprecationConflict) -> Issue:
             "\n\n",
             f"Deprecation reference id: {conflict.conflict_hash}",
             "\n\n### Doc Page\n\n",
-            conflict.article.name,
+            f"[{conflict.article.name}]({conflict.article.url})",
         )
     )
     return Issue(
