@@ -16,7 +16,9 @@ class Article:
 
     @property
     def name(self) -> str:
-        raise NotImplementedError  # TODO
+        filename = self.filename.rstrip(".md")
+        article_name = filename.replace("-", " ").replace("_", " ")
+        return article_name.capitalize()
 
     def get_conflicts(self) -> list[DeprecationConflict]:
         conflicts = []
