@@ -55,9 +55,11 @@ async def post_issue(client: httpx.AsyncClient, conflict: DeprecationConflict, c
         title=issue.title,
         body=issue.body,
     )
+    logger.info(f"New issue has been posted at {issue_url} for conflict {conflict.conflict_hash}")
     cursor = connection.cursor()
     statement = "UPDATE conflicts SET action_done=? WHERE hash=?;"
     cursor.execute(statement, (True, conflict.conflict_hash))
+    logger.info(f"Conflict {conflict.conflict_hash} marked as resolved")
     return issue_url
 
 
@@ -80,7 +82,7 @@ async def create_issues(conflicts: list[DeprecationConflict]) -> list[str]:
         ]
         t0 = time()
         issue_urls: list[str] = await asyncio.gather(*conflict_tasks)
-        logger.info(f"{len(conflict_tasks)} created in {round(time() - t0, 4)}")
+        logger.info(f"{len(conflict_tasks)} issues created in {round(time() - t0, 4)}")
 
     db_connection.commit()
     return issue_urls
