@@ -32,6 +32,12 @@ def create_issue(conflict: DeprecationConflict) -> Issue:
             f"Deprecation reference id: {conflict.conflict_hash}",
             "\n\n### Doc Page\n\n",
             f"[{conflict.article.name}]({conflict.article.url})",
+            "\n\n### Note\n\n",
+            "This issue has been automatically created by the ",
+            "[Wiki deprecation bot](https://github.com/airalab/robonomics-wiki-deprecation-notifier). ",
+            "If this is a false alarm and the article is not actually deprecated - ",
+            "feel free to close this issue. It will not be created again "
+            f"unless a new release comes out in [{conflict.dependency.name}]({conflict.dependency.url}).",
         )
     )
     return Issue(
