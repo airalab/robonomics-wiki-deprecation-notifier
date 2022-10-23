@@ -43,6 +43,7 @@ async def resolve_conflicts(conflicts: list[DeprecationConflict]) -> None:
         save_conflict(conflict, db_connection)
         db_connection.commit()
         logger.debug(f"Conflict {conflict.conflict_hash} registered as new and saved")
+    await create_issues(conflicts)
 
 
 async def post_issue(client: httpx.AsyncClient, conflict: DeprecationConflict, connection: sqlite3.Connection) -> str:
