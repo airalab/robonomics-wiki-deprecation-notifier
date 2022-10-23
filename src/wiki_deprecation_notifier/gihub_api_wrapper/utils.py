@@ -9,5 +9,8 @@ def get_repo_owner(repo_url: str) -> str:
 
 def get_repo_name(repo_url: str) -> str:
     source_url = URL(repo_url)
-    owner, name, _ = source_url.path.lstrip("/").split("/", 2)
+    try:
+        owner, name, _ = source_url.path.lstrip("/").split("/", 2)
+    except ValueError:
+        owner, name = source_url.path.lstrip("/").split("/", 1)
     return str(name)
