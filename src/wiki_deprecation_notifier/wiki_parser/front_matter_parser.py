@@ -9,6 +9,8 @@ import yaml
 from loguru import logger
 from yarl import URL
 
+from ..gihub_api_wrapper.utils import get_repo_name
+
 TARGET_REPO_OWNERS = set(json.loads(os.getenv("TARGET_REPO_OWNERS", '["Multi-Agent-io", "airalab"]')))
 FILTER_REPOS_BY_OWNERS: bool = typed_getenv.getenv("FILTER_REPOS_BY_OWNERS", True, var_type=bool, optional=True)
 
@@ -30,7 +32,8 @@ def extract_dependencies(article: str) -> list[tuple[str, str]]:  # noqa: CAC001
 
     for dependency in dependencies:
         try:
-            name, source = dependency.rsplit(" ", 1)
+            _, source = dependency.rsplit(" ", 1)
+            repo_name = get_repo_name(source)
         except ValueError:
             continue
 
@@ -51,6 +54,6 @@ def extract_dependencies(article: str) -> list[tuple[str, str]]:  # noqa: CAC001
             logger.error(f"Failed to extract repo url from URL '{source}'")
             continue
 
-        result.append((name, repo_url[0]))
+        result.append((repo_name, repo_url[0]))
 
     return result
