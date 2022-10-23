@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
@@ -29,7 +30,7 @@ class DeprecationConflict:
 
     @property
     def conflict_hash(self) -> str:
-        return str(hash(self.conflict_signature))
+        return hashlib.md5(self.conflict_signature.encode()).hexdigest()
 
     @property
     def issue(self) -> Issue:
