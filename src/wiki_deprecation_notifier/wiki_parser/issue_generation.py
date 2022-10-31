@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 def create_issue(conflict: DeprecationConflict) -> Issue:
     issue_title = "".join(  # noqa: ECE001
         (
-            "[Issue]: ",
+            "[Deprecation]: ",
             f'Article "{conflict.article.name}" is deprecated due to ',
             f'a release "{conflict.dependency.latest_release.name}" ',
             f'in "{conflict.dependency.name}".',
