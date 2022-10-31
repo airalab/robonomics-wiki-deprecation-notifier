@@ -54,6 +54,8 @@ async def post_issue(client: httpx.AsyncClient, conflict: DeprecationConflict, c
         repo_name=issue.repo_name,
         title=issue.title,
         body=issue.body,
+        labels=["deprecation"],
+        assignees=[c.username for c in conflict.article.contributors],
     )
     logger.info(f"New issue has been posted at {issue_url} for conflict {conflict.conflict_hash}")
     cursor = connection.cursor()

@@ -82,11 +82,23 @@ async def get_latest_release_name_url_and_datetime(
     return release_name, release_url, release_datetime
 
 
-async def create_new_issue(client: httpx.AsyncClient, repo_owner: str, repo_name: str, title: str, body: str) -> str:
+async def create_new_issue(  # noqa: CFQ002
+    client: httpx.AsyncClient,
+    repo_owner: str,
+    repo_name: str,
+    title: str,
+    body: str,
+    labels: list[str] | None = None,
+    assignees: list[str] | None = None,
+) -> str:
     url = f"/repos/{repo_owner}/{repo_name}/issues"
-    json = {
+    json: dict[str, str | list[str]] = {
         "title": title,
         "body": body,
     }
+    if labels is not None:
+        json["labels"] = labels
+    if assignees is not None:
+        json["assignees"] = assignees
     response = await client.post(url=url, json=json)
     return str(response.json()["html_url"])
