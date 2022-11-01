@@ -8,11 +8,13 @@ from loguru import logger
 from .FileDescriptor import FileDescriptor
 
 
+@logger.catch(reraise=True)
 async def get_file_text_contents(client: httpx.AsyncClient, file_link: str) -> str:
     response = await client.get(file_link)
     return str(response.text)
 
 
+@logger.catch(reraise=True)
 async def get_files_last_modified_date(
     client: httpx.AsyncClient, repo_owner: str, repo_name: str, file_path: str
 ) -> datetime:
@@ -27,6 +29,7 @@ async def get_files_last_modified_date(
     return datetime.fromisoformat(date.rstrip("Z"))
 
 
+@logger.catch(reraise=True)
 async def get_files_in_dir(  # noqa: CAC001
     client: httpx.AsyncClient, repo_owner: str, repo_name: str, dir_path: str
 ) -> list[FileDescriptor]:
@@ -67,6 +70,7 @@ async def get_files_in_dir(  # noqa: CAC001
     return files
 
 
+@logger.catch(reraise=True)
 async def get_latest_release_name_url_and_datetime(
     client: httpx.AsyncClient, repo_owner: str, repo_name: str
 ) -> tuple[str, str, datetime]:
@@ -93,6 +97,7 @@ async def get_latest_release_name_url_and_datetime(
     return release_name, release_url, release_datetime
 
 
+@logger.catch(reraise=True)
 async def create_new_issue(  # noqa: CFQ002
     client: httpx.AsyncClient,
     repo_owner: str,
@@ -107,9 +112,21 @@ async def create_new_issue(  # noqa: CFQ002
         "title": title,
         "body": body,
     }
-    if labels is not None:
+    if labels:
         json["labels"] = labels
-    if assignees is not None:
+    if assignees:
         json["assignees"] = assignees
-    response = await client.post(url=url, json=json)
+
+    try:
+        response = await client.post(url=url, json=json)
+    except httpx.HTTPStatusError as e:
+        # FIXME: Assignee cannot be a person other than organisation member or repo contributor.
+        # If one of the article contributors is not applicable for assignee - the request will return code 422.
+        # For now we will just drop assignees all together in this case, as there is no reliable way to know
+        # if an account can be an assignee or not
+        if "assignees" in json:
+            del json["assignees"]
+        logger.warning(f"Failed to create an issue. Trying again without specifying the issue assignees. {e}")
+        response = await client.post(url=url, json=json)
+
     return str(response.json()["html_url"])
