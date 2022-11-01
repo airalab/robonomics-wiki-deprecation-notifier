@@ -18,6 +18,17 @@ def create_issue(conflict: DeprecationConflict) -> Issue:
             f'in "{conflict.dependency.name}".',
         )
     )
+    if contributors := conflict.article.contributors:
+        contributors_block = "".join(
+            (
+                "An action has been requested from the article contributors:\n",
+                "\n".join(f"- {c.handle}" for c in contributors),
+                "\n\n",
+            )
+        )
+    else:
+        contributors_block = ""
+
     issue_body = "".join(  # noqa: ECE001
         (
             "### Issue description\n\n",
@@ -26,9 +37,7 @@ def create_issue(conflict: DeprecationConflict) -> Issue:
             f'a recent release ["{conflict.dependency.latest_release.name}"]({conflict.dependency.latest_release.url}) ',
             f'in ["{conflict.dependency.name}"]({conflict.dependency.url}).',
             "\n\n",
-            "An action has been requested from the article contributors:\n",
-            "\n".join(f"- {c.handle}" for c in conflict.article.contributors),
-            "\n\n",
+            contributors_block,
             f"Deprecation reference id: {conflict.conflict_hash}",
             "\n\n### Doc Page\n\n",
             f"[{conflict.article.name}]({conflict.article.url})",
