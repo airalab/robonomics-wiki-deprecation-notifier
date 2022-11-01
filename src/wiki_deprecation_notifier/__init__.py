@@ -6,6 +6,7 @@ from loguru import logger
 
 from ._conflict_resolver import get_conflicts, resolve_conflicts
 from ._dependency_mapping import get_dependency_map
+from .gihub_api_wrapper.client_settings import REQUEST_CNT
 
 
 async def run_inspection() -> None:
@@ -18,6 +19,7 @@ async def run_inspection() -> None:
     else:
         logger.info("No deprecations found. Skipping conflict resolution")
     logger.debug(f"Inspection run complete. Run time: {round(time() - t0, 4)}s")
+    logger.debug(f"Made {REQUEST_CNT.value} requests during the run")
 
 
 async def start_daemon() -> None:
