@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Any
 
 import httpx
+from loguru import logger
 
 from .FileDescriptor import FileDescriptor
 
@@ -71,10 +72,20 @@ async def get_latest_release_name_url_and_datetime(
 ) -> tuple[str, str, datetime]:
     url = f"/repos/{repo_owner}/{repo_name}/releases"
     params = {"per_page": 1, "page": 1}
-    response = await client.get(url=url, params=params)
-    latest_releases: list[Any] = response.json()
-    if not latest_releases:
-        return "Unknown", "Unknown", datetime.fromtimestamp(0)
+
+    default_return = ("Unknown", "Unknown", datetime.fromtimestamp(0))
+    try:
+        response = await client.get(url=url, params=params)
+        latest_releases: list[Any] = response.json()
+        if not latest_releases:
+            raise ValueError(f"No releases found in repository '{repo_owner}/{repo_name}'")
+    except httpx.HTTPStatusError as e:
+        logger.error(f"Could not obtain releases from repo '{repo_owner}/{repo_name}'. Private repository? {e}")
+        return default_return
+    except ValueError as e:
+        logger.warning(str(e))
+        return default_return
+
     latest_release = latest_releases[0]
     release_name = latest_release["name"]
     release_url = latest_release["html_url"]
