@@ -3,6 +3,7 @@ import os
 from time import time
 
 import httpx
+import httpx_cache
 from loguru import logger
 
 from .gihub_api_wrapper.api_wrappers import get_files_in_dir, get_latest_release_name_url_and_datetime
@@ -19,7 +20,7 @@ from .wiki_parser.Repo import Repo
 async def get_dependency_map() -> list[Article]:
     t0 = time()
     logger.debug("Started gathering dependency map")
-    async with httpx.AsyncClient(**httpx_client_settings) as client:
+    async with httpx_cache.AsyncClient(**httpx_client_settings) as client:
         article_files = await get_files_in_dir(
             client=client,
             repo_owner=os.environ["WIKI_REPO_OWNER"],
