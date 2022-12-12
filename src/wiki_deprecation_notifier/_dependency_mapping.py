@@ -25,7 +25,7 @@ async def get_dependency_map() -> list[Article]:
             client=client,
             repo_owner=os.environ["WIKI_REPO_OWNER"],
             repo_name=os.environ["WIKI_REPO_NAME"],
-            dir_path="/docs/en",
+            dir_path="/docs",
         )
         logger.debug(f"Fetched {len(article_files)} articles in {round(time() - t0, 4)}s")
         tasks = (_parse_article(client=client, article_file=article_file) for article_file in article_files)

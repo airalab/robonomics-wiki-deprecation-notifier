@@ -36,14 +36,21 @@ async def get_files_in_dir(  # noqa: CAC001
     dir_path = dir_path.lstrip("/")
     url = f"/repos/{repo_owner}/{repo_name}/contents/{dir_path}"
     response = await client.get(url=url)
-    files = [
-        FileDescriptor(
-            name=file_data["name"],
-            path=file_data["path"],
-            download_url=file_data["download_url"],
+    response_data = response.json()
+    files = []
+
+    for file_entry in response_data:
+        if file_entry.get("type") != "file":
+            continue
+        if not file_entry.get("name", "").endswith(".md"):
+            continue
+        entry = FileDescriptor(
+            name=file_entry["name"],
+            path=file_entry["path"],
+            download_url=file_entry["download_url"],
         )
-        for file_data in response.json()
-    ]
+        files.append(entry)
+
     date_tasks = (
         get_files_last_modified_date(
             client=client,
