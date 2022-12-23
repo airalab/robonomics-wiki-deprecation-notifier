@@ -76,7 +76,7 @@ async def resolve_conflicts(conflicts: list[DeprecationConflict]) -> None:  # no
             if is_valid:
                 new_conflicts.append(conflict)
             else:
-                logger.info(f"Conflict '{conflict.conflict_signature}' marked as invalid. Skipping")
+                logger.info(f"Conflict '{conflict.article.name}-{conflict.dependency.name}' marked as invalid. Skipping")
         conflicts = new_conflicts
 
     for conflict in conflicts:
