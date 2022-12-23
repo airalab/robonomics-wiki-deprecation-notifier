@@ -3,6 +3,7 @@ import sqlite3
 from time import time
 
 import httpx
+import httpx_cache
 from loguru import logger
 from typed_getenv import getenv
 
@@ -66,7 +67,7 @@ async def resolve_conflicts(conflicts: list[DeprecationConflict]) -> None:  # no
             new_conflicts.append(conflict)
     conflicts = new_conflicts
 
-    async with httpx.AsyncClient(**httpx_client_settings) as client:
+    async with httpx_cache.AsyncClient(**httpx_client_settings) as client:
         tasks = (is_valid_conflict(client, conflict) for conflict in conflicts)
         conflict_validations = await asyncio.gather(*tasks)
 
@@ -76,7 +77,9 @@ async def resolve_conflicts(conflicts: list[DeprecationConflict]) -> None:  # no
             if is_valid:
                 new_conflicts.append(conflict)
             else:
-                logger.info(f"Conflict '{conflict.article.name}-{conflict.dependency.name}' marked as invalid. Skipping")
+                logger.info(
+                    f"Conflict '{conflict.article.name}-{conflict.dependency.name}' marked as invalid. Skipping"
+                )
         conflicts = new_conflicts
 
     for conflict in conflicts:
