@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robonomics-wiki-deprecation-notifier"
-version = "1.0.1"
+version = "1.1.0"
 description = "A tool to notify Robonomics Wiki contributors about possible article deprecations"
 authors = ["arseniiarsenii <arseniivelichko2@gmail.com>"]
 readme = "README.md"
