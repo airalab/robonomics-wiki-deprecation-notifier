@@ -7,4 +7,6 @@ from .Release import Release
 class Repo:
     name: str
     url: str
+    repo_owner: str
+    repo_name: str
     latest_release: Release

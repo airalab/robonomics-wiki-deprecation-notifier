@@ -105,6 +105,27 @@ async def get_latest_release_name_url_and_datetime(
 
 
 @logger.catch(reraise=True)
+async def get_latest_release_titles(
+    client: httpx.AsyncClient, repo_owner: str, repo_name: str, release_count: int
+) -> list[str]:
+    url = f"/repos/{repo_owner}/{repo_name}/releases"
+    params = {"per_page": release_count, "page": 1}
+
+    try:
+        response = await client.get(url=url, params=params)
+        latest_releases: list[Any] = response.json()
+        if len(latest_releases) < release_count:
+            raise ValueError(f"No {release_count} releases found in repository '{repo_owner}/{repo_name}'")
+        return [release["name"] for release in latest_releases]
+    except httpx.HTTPStatusError as e:
+        logger.error(f"Could not obtain releases from repo '{repo_owner}/{repo_name}'. Private repository? {e}")
+    except ValueError as e:
+        logger.warning(str(e))
+
+    return []
+
+
+@logger.catch(reraise=True)
 async def create_new_issue(  # noqa: CFQ002
     client: httpx.AsyncClient,
     repo_owner: str,

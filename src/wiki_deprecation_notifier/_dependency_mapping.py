@@ -67,4 +67,6 @@ async def _get_repo_w_latest_release(client: httpx.AsyncClient, project_name: st
         date=release_date,
     )
     base_repo_url = "/".join(repo_url.split("/")[:5])
-    return Repo(name=project_name, url=base_repo_url, latest_release=release)
+    return Repo(
+        name=project_name, url=base_repo_url, repo_owner=repo_owner, repo_name=repo_name, latest_release=release
+    )

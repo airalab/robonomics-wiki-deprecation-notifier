@@ -4,9 +4,11 @@ from time import time
 
 import httpx
 from loguru import logger
+from typed_getenv import getenv
 
+from ._utils import notification_required
 from .db_wrapper.db import connection as db_connection
-from .gihub_api_wrapper.api_wrappers import create_new_issue
+from .gihub_api_wrapper.api_wrappers import create_new_issue, get_latest_release_titles
 from .gihub_api_wrapper.client_settings import httpx_client_settings
 from .wiki_parser.Article import Article
 from .wiki_parser.DeprecationConflict import DeprecationConflict
@@ -35,14 +37,53 @@ def save_conflict(conflict: DeprecationConflict, connection: sqlite3.Connection)
     cursor.execute(statement, (conflict.conflict_hash, conflict.conflict_signature, True, False))
 
 
-async def resolve_conflicts(conflicts: list[DeprecationConflict]) -> None:
+async def is_valid_conflict(client: httpx.AsyncClient, conflict: DeprecationConflict) -> bool:
+    latest_release_titles = await get_latest_release_titles(
+        client=client,
+        repo_owner=conflict.dependency.repo_owner,
+        repo_name=conflict.dependency.repo_name,
+        release_count=2,
+    )
+    if len(latest_release_titles) < 2:
+        logger.warning(
+            f"Cant compare latest releases for {conflict.dependency.name}. "
+            f"Not enough releases: {len(latest_release_titles)}"
+        )
+        return True
+    try:
+        return notification_required(latest_release_titles[0], latest_release_titles[1])
+    except Exception as e:
+        logger.error(f"An error occurred while validating the conflict: {e}")
+        return True
+
+
+async def resolve_conflicts(conflicts: list[DeprecationConflict]) -> None:  # noqa: CCR001
+    new_conflicts = []
     for conflict in conflicts:
         if conflict_saved(conflict, db_connection):
             logger.debug(f"Conflict {conflict.conflict_hash} found in DB. Ignoring")
-            continue
+        else:
+            new_conflicts.append(conflict)
+    conflicts = new_conflicts
+
+    async with httpx.AsyncClient(**httpx_client_settings) as client:
+        tasks = (is_valid_conflict(client, conflict) for conflict in conflicts)
+        conflict_validations = await asyncio.gather(*tasks)
+
+    if getenv("SKIP_PATCH_RELEASES", False, var_type=bool, optional=True):
+        new_conflicts = []
+        for conflict, is_valid in zip(conflicts, conflict_validations):
+            if is_valid:
+                new_conflicts.append(conflict)
+            else:
+                logger.info(f"Conflict '{conflict.conflict_signature}' marked as invalid. Skipping")
+        conflicts = new_conflicts
+
+    for conflict in conflicts:
         save_conflict(conflict, db_connection)
         db_connection.commit()
         logger.debug(f"Conflict {conflict.conflict_hash} registered as new and saved")
+
     await create_issues(conflicts)
 
 
