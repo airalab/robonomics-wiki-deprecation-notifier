@@ -65,6 +65,7 @@ The environment variables and their meanings are listed below.
 - `WIKI_REPO_OWNER` (string) - Robonomics wiki repository owner account (organisation) name.
 - `TARGET_REPO_OWNERS` (JSON array of strings) - Only repositories owned by these accounts (organisations) will be
   marked as tracked dependencies.
+- `SKIP_PATCH_RELEASES` (boolean) - Whether to skip patch releases in dependencies or not (defaults to `false`)
 - `FILTER_REPOS_BY_OWNERS` (boolean) - Whether to filter repositories by their owner or not (defaults to `true`)
 - `GITHUB_API_TOKEN` (string) - Since this app makes heavy use of the GitHub API, you need to generate and provide an
   API token for the bot.
