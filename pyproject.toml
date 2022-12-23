@@ -8,10 +8,10 @@ packages = [{include = "robonomics_wiki_deprecation_notifier"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-httpx = "^0.23.0"
+httpx = "^0.23.1"
 loguru = "^0.6.0"
 PyYAML = "^6.0"
-yarl = "^1.8.1"
+yarl = "^1.8.2"
 python-dotenv = "^0.21.0"
 typed-getenv = "^0.1.2"
 httpx-cache = "^0.6.1"
@@ -19,6 +19,7 @@ semantic-version = "^2.10.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^2.20.0"
+poetryup = "^0.12.7"
 
 [build-system]
 requires = ["poetry-core"]
