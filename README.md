@@ -53,8 +53,15 @@ The info about the created issue is saved to the DB.
 This app runs on the set schedule using the GitHub actions platform. The schedule of the runs can be altered by
 modifying the Cron syntax in the `/.github/dcheduled_run.yml` file.
 
-Settings can be applied using the environment variables. Environment variables can either be set using the `.env`
+Settings can be applied using the environment variables. Environment variables can either be set using a `.env`
 file or the repository secrets.
+
+Copy `src/.env.example` to `src/.env` and fill in your own values for local runs. `.env` is gitignored — never
+commit real credentials. In CI, `GITHUB_API_TOKEN` comes from the repository secret `API_TOKEN`, and
+`WIKI_REPO_OWNER` / `WIKI_REPO_NAME` are set in `.github/workflows/scheduled_run.yml`.
+
+Note that `GITHUB_API_TOKEN`, `WIKI_REPO_OWNER` and `WIKI_REPO_NAME` are read without defaults — the run fails if
+any of them is missing.
 
 The environment variables and their meanings are listed below.
 

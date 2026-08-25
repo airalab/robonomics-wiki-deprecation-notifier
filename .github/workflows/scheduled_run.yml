@@ -36,6 +36,9 @@ jobs:
       - name: execute py script # run main.py
         env:
           GITHUB_API_TOKEN: ${{ secrets.API_TOKEN }}
+          # Read via os.environ[...] with no default — the run fails without them
+          WIKI_REPO_OWNER: airalab
+          WIKI_REPO_NAME: robonomics-wiki
         run: |
           cd src
           python main.py

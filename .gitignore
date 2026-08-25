@@ -1,0 +1,8 @@
+# Local configuration — never commit real values
+.env
+src/.env
+
+__pycache__/
+*.py[cod]
+.venv/
+venv/
